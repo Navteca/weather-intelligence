@@ -14,6 +14,7 @@ Built following MCP best practices with security hardening:
 
 import asyncio
 import logging
+import os
 from typing import Annotated
 
 from mcp.server.fastmcp import FastMCP
@@ -32,10 +33,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+MCP_HOST = os.getenv("MCP_HOST", "0.0.0.0")
+MCP_PORT = int(os.getenv("MCP_PORT", "8000"))
+
 mcp = FastMCP(
     name="weather-intelligence",
-    version="0.1.0",
-    description="Weather intelligence tools for outdoor activities, surfing, and gardening",
+    instructions="Weather intelligence tools for outdoor activities, surfing, and gardening",
+    host=MCP_HOST,
+    port=MCP_PORT,
 )
 
 # ---------------------------------------------------------------------------
@@ -393,7 +398,9 @@ async def garden_watering_advisor(
 
 def main():
     """Run the MCP server."""
-    mcp.run()
+    # Default to HTTP transport for server deployments.
+    transport = os.getenv("MCP_TRANSPORT", "streamable-http")
+    mcp.run(transport=transport)
 
 
 if __name__ == "__main__":
